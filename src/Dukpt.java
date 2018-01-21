@@ -11,6 +11,7 @@ public class Dukpt {
   private String KSNR;
   private String IKEY; //= "0A71CFB531452EDB46794A3BDF307ACB";
   private String CURKEY;
+static int intSR;
 
   public Dukpt(){
     List<String> KSNs = ReadFile.readFile("KSN.txt");
@@ -18,22 +19,33 @@ public class Dukpt {
     List<String> IPEKs = ReadFile.readFile("IPEK.txt");
     String IPEK = IPEKs.get(0);
     KSNR = KSN.substring(KSN.length()-16,KSN.length());
+    System.out.println("KSNR "+ KSNR);
     IKEY = IPEK.substring(IPEK.length()-32,IPEK.length());
+    System.out.println("IKEY "+IKEY);
     CURKEY = IKEY;
-    R8 = hexToBin(KSNR).substring(0, hexToBin(KSNR).length() - 21);
+    R8 = clearBits(hexToBin(KSNR),21);
+    System.out.println("R8 "+R8);
     R3 = hexToBin(KSNR).substring(hexToBin(KSNR).length() - 21, hexToBin(KSNR).length());
-    SR = R3.substring(0, R3.length() - 20);
-  }
+    System.out.println("R3 "+R3);
+    setSR("100000000000000000000");
+//    SR = R3.substring(0, R3.length() - 20);
+      intSR = Integer.parseInt(getSR(), 2);
 
+      System.out.println("SR "+SR);
+
+  }
 
   public String TAG1(Dukpt dukpt){
     //1
-    int intSR = Integer.parseInt(dukpt.getSR(), 2);
+    System.out.println("intSR "+intSR);
     int intR3 = Integer.parseInt(dukpt.getR3(), 2);
+//    System.out.println(intR3);
+
     if((intSR & intR3) == 0){
       TAG2(dukpt);
     }
     else{
+          System.out.println("else");
     //2
       String rightMost21bitsR8 = dukpt.getR8().substring(dukpt.getR8().length() - 21, dukpt.getR8().length());
       Integer intRightMost21bitsR8 = Integer.parseInt(rightMost21bitsR8, 2);
@@ -70,6 +82,7 @@ public class Dukpt {
       R8B = checkLength(R8Bv2, CURKEY.substring(CURKEY.length()/2, CURKEY.length()));
     //10, 11
       CURKEY = R8B + R8A;
+      System.out.println(CURKEY);
       return CURKEY;
     }
     return null;
@@ -77,15 +90,15 @@ public class Dukpt {
 
   public String TAG2(Dukpt dukpt){
     //1
-    int intSR = Integer.parseInt(SR, 2);
+//    int intSR = Integer.parseInt(SR, 2);
     intSR >>= 1;
     //2
     if(intSR != 0){
-      TAG1(dukpt);
+        TAG1(dukpt);
     }
     else {
-      //3
-      String curkeyLast = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), "00000000000000FF");
+        //3
+        String curkeyLast = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), "00000000000000FF");
       curkeyLast = checkLength(curkeyLast, CURKEY.substring(CURKEY.length()/2, CURKEY.length()));
       String curkeyFirst = xorLongStrings(CURKEY.substring(0, CURKEY.length()/2), "00000000000000FF");
       curkeyFirst = checkLength(curkeyFirst, CURKEY.substring(0, CURKEY.length()/2));
@@ -102,6 +115,17 @@ public class Dukpt {
         s1 = "0" + s1;
       }
     }
+    return s1;
+  }
+
+  public String clearBits (String s1, int bit)
+  {
+    String x,y,z;
+    x=s1.substring(0,s1.length()-bit);
+    y=s1.substring(s1.length()-bit,(s1.length()));
+    z=y.replace('1','0');
+//    System.out.println(z);
+    s1=x+z;
     return s1;
   }
 
