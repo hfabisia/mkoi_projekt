@@ -1,7 +1,15 @@
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
+import javax.xml.bind.DatatypeConverter;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
-public class Dukpt {
+public class Dukpt{
 
   private String R8;
   private String R8A;
@@ -28,6 +36,7 @@ static int intSR;
     R3 = hexToBin(KSNR).substring(hexToBin(KSNR).length() - 21, hexToBin(KSNR).length());
     System.out.println("R3 "+R3);
     setSR("100000000000000000000");
+//      setSR("100000000000000001100");
 //    SR = R3.substring(0, R3.length() - 20);
       intSR = Integer.parseInt(getSR(), 2);
 
@@ -61,12 +70,35 @@ static int intSR;
     //3
       String R8Av1 = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), binToHex(R8));
       R8A = checkLength(R8Av1, CURKEY.substring(CURKEY.length()/2, CURKEY.length()));
-    //4
-    //?????????????
-    //5
+        System.out.println("R8A - "+R8A);
+
+        //4
+    //???????
+        String desKey = getCURKEY().substring(0,getCURKEY().length()/2);//"1113456789abcdef";
+        System.out.println("desKey - "+desKey);
+        byte[] keyBytes = DatatypeConverter.parseHexBinary(desKey);
+        try {
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("DES");
+            SecretKey key = factory.generateSecret(new DESKeySpec(keyBytes));
+            DesEncrypter encrypter = new DesEncrypter(key);
+            String encrypted = encrypter.encrypt(R8A);
+//            String decrypted = encrypter.decrypt(encrypted);
+            System.out.println("Kodowanie - "+encrypted);
+//            System.out.println("Odkodowywanie = "+decrypted);
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //5
       String R8Av2 = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), R8A);
       R8A = checkLength(R8Av2, CURKEY.substring(CURKEY.length()/2, CURKEY.length()));
-    //6
+    //6 Czemu xor na jednej i drugiej połiwue?
       String curkeyLast = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), "C0C0C0C000000000");
       curkeyLast = checkLength(curkeyLast, CURKEY.substring(CURKEY.length()/2, CURKEY.length()));
       String curkeyFirst = xorLongStrings(CURKEY.substring(0, CURKEY.length()/2), "C0C0C0C000000000");
@@ -233,4 +265,39 @@ static int intSR;
     this.CURKEY = CURKEY;
   }
 
+  // Klasa DES
+  static class DesEncrypter {
+      Cipher ecipher;
+      Cipher dcipher;
+
+      DesEncrypter(SecretKey key) throws Exception {
+          ecipher = Cipher.getInstance("DES");
+          dcipher = Cipher.getInstance("DES");
+          ecipher.init(Cipher.ENCRYPT_MODE, key);
+          dcipher.init(Cipher.DECRYPT_MODE, key);
+      }
+
+      public String encrypt(String str) throws Exception {
+          // Encode the string into bytes using utf-8
+          byte[] utf8 = str.getBytes ("UTF8");
+
+
+          // Encrypt
+          byte[] enc = ecipher.doFinal(utf8);
+
+          // Encode bytes to base64 to get a string
+          return new sun.misc.BASE64Encoder().encode(enc);
+      }
+
+      public String decrypt(String str) throws Exception {
+          // Decode base64 to get bytes
+          byte[] dec = new sun.misc.BASE64Decoder().decodeBuffer(str);
+
+          byte[] utf8 = dcipher.doFinal(dec);
+
+          // Decode using utf-8
+          return new String(utf8, "UTF8");
+      }
+  }
 }
+
