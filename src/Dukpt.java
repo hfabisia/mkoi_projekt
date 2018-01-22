@@ -110,7 +110,7 @@ static int intSR;
     //8
     //???????????
     //9
-      String R8Bv2 = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), R8A);
+      String R8Bv2 = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), R8B);
       R8B = checkLength(R8Bv2, CURKEY.substring(CURKEY.length()/2, CURKEY.length()));
     //10, 11
       CURKEY = R8B + R8A;
