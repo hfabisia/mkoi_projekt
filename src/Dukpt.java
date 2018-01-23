@@ -1,6 +1,9 @@
 import java.math.BigInteger;
 import java.util.List;
 
+/**
+ * Klasa, w której zaimplementowany jest algorytm "Security Module" Algorithm For Automatic PIN Entry Device Checking
+ */
 public class Dukpt {
 
     /**
@@ -62,6 +65,7 @@ public class Dukpt {
     }
 
     /**
+     * <pre>
      * Metoda TAG1 wykonuje następujący algorytm:
      * 1) Is SR AND'ed with R3 = 0? If yes, go to "TAG2".
      * 2) "OR" SR into the 21 right-most bits of R8. (This sets the R8 bit corresponding to the SR bit that is set.)
@@ -73,7 +77,7 @@ public class Dukpt {
      * 8) DEA-encrypt R8B using the left half of CURKEY as the key and store the result into R8B.
      * 9) XOR R8B with the right half of CURKEY and store the result into R8B.
      * 10) Store R8A into the right half of CURKEY.
-     *
+     *</pre>
      * @param dukpt
      * @return
      */
@@ -134,13 +138,14 @@ public class Dukpt {
     }
 
     /**
+     * <pre>
      * Metoda TAG2 wykonuje następujący algorytm:
      * 1) Shift SR right one bit.
      * 2) If SR is not equal to zero (if the "one" bit has not been shifted off), go to "TAG1".
      * 3) XOR CURKEY with hexadecimal “0000 0000 0000 00FF 0000 0000 0000 00FF” and go to “Exit”.
      * (CURKEY now holds the PIN-encryption key that the security module will use to triple-DEA decrypt the
      * received encrypted PIN block.)
-     *
+     *</pre>
      * @param dukpt
      * @return
      */

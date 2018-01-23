@@ -7,7 +7,10 @@
 import java.math.BigInteger;
 import java.util.Arrays;
 
-class DES {
+/**
+ * Klasa, w której zaimplementowane są metody służące do szufrowania danych algorytmem DES
+ */
+public class DES {
     // Initial Permutation table
     private static final byte[] IP = {
             58, 50, 42, 34, 26, 18, 10, 2,

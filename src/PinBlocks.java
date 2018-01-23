@@ -1,3 +1,6 @@
+/**
+ * Klasa, w ktorej zaimplementowane są metody służące do obliczenia PinBlock
+ */
 public class PinBlocks {
 
     private String PIN;
