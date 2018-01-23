@@ -111,8 +111,8 @@ static int intSR;
       R8B = checkLength(R8Bv1, CURKEY.substring(CURKEY.length()/2, CURKEY.length()));
     //8
 //      System.out.println("desKey - "+desKey);
-
-      R8B = DES.finalOutput(R8B, desKey);
+      String desKey1 = CURKEY.substring(0,CURKEY.length()/2);
+      R8B = DES.finalOutput(R8B, desKey1);
       System.out.println("R8B po encrypcie - "+R8B);
     //9
       String R8Bv2 = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), R8B);

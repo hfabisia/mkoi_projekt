@@ -37,7 +37,10 @@ public class Main {
     System.out.println(dukpt.TAG1(dukpt));
     System.out.println(dukpt.TAG2(dukpt));
     String a = DES.finalOutput("2236ff2d27b3ef0d", "C1D0F8FB4958670D");
+
+    String b = DES.finalOutput("0412AC89ABCDEF67", "0853983ee508c4b546794a3bdf307acb");
 //    System.out.println(Arrays.toString(DES.finalOutput("2236ff2d27b3ef0d", "C1D0F8FB4958670D")  ));
     System.out.println("aaaaaaaaaa "+ a);
+    System.out.println("bb "+ b);
   }
 }
