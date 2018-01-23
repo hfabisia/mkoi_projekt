@@ -76,25 +76,27 @@ static int intSR;
     //???????
         String desKey = getCURKEY().substring(0,getCURKEY().length()/2);//"1113456789abcdef";
         System.out.println("desKey - "+desKey);
-        byte[] keyBytes = DatatypeConverter.parseHexBinary(desKey);
-        try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("DES");
-            SecretKey key = factory.generateSecret(new DESKeySpec(keyBytes));
-            DesEncrypter encrypter = new DesEncrypter(key);
-            String encrypted = encrypter.encrypt(R8A);
-//            String decrypted = encrypter.decrypt(encrypted);
-            System.out.println("Kodowanie - "+encrypted);
-//            System.out.println("Odkodowywanie = "+decrypted);
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        R8A = DES.finalOutput(R8A, desKey);
+        System.out.println("R8A po encrypcie - "+R8A);
+//        byte[] keyBytes = DatatypeConverter.parseHexBinary(desKey);
+//        try {
+//            SecretKeyFactory factory = SecretKeyFactory.getInstance("DES");
+//            SecretKey key = factory.generateSecret(new DESKeySpec(keyBytes));
+//            DesEncrypter encrypter = new DesEncrypter(key);
+//            String encrypted = encrypter.encrypt(R8A);
+////            String decrypted = encrypter.decrypt(encrypted);
+//            System.out.println("Kodowanie - "+encrypted);
+////            System.out.println("Odkodowywanie = "+decrypted);
+//
+//        } catch (NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        } catch (InvalidKeySpecException e) {
+//            e.printStackTrace();
+//        } catch (InvalidKeyException e) {
+//            e.printStackTrace();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         //5
       String R8Av2 = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), R8A);
       R8A = checkLength(R8Av2, CURKEY.substring(CURKEY.length()/2, CURKEY.length()));
@@ -108,9 +110,12 @@ static int intSR;
       String R8Bv1 = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), binToHex(R8));
       R8B = checkLength(R8Bv1, CURKEY.substring(CURKEY.length()/2, CURKEY.length()));
     //8
-    //???????????
+//      System.out.println("desKey - "+desKey);
+
+      R8B = DES.finalOutput(R8B, desKey);
+      System.out.println("R8B po encrypcie - "+R8B);
     //9
-      String R8Bv2 = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), R8A);
+      String R8Bv2 = xorLongStrings(CURKEY.substring(CURKEY.length()/2, CURKEY.length()), R8B);
       R8B = checkLength(R8Bv2, CURKEY.substring(CURKEY.length()/2, CURKEY.length()));
     //10, 11
       CURKEY = R8B + R8A;
