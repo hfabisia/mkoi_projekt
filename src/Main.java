@@ -21,10 +21,14 @@ public class Main {
         Scanner odczyt1 = new Scanner(System.in); //obiekt do odebrania danych od użytkownika
         PIN = odczyt1.nextLine();
         System.out.println("Podany nr PIN: " + PIN);
-
-        System.out.println("Clear PIN block:" + PinBlocks.PinBlockEncrypt(PIN, PAN));
+        String message = PinBlocks.PinBlockEncrypt(PIN, PAN);
+        System.out.println("Clear PIN block:" + message);
         System.out.println("-----------------------");
-        dukpt.TAG1(dukpt);
-        dukpt.TAG2(dukpt);
+        String key = dukpt.TAG1(dukpt);
+
+        String finalResult = DES.finalOutput(message,key);
+        System.out.println("Wykorzystując Derived PEK jako klucz oraz Clear PIN block jako dane otrzymujemy zakodowaną wiadomość: " + finalResult);
+
+
     }
 }

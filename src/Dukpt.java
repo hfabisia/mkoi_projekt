@@ -134,7 +134,7 @@ public class Dukpt {
             System.out.println("Derived PEK: " + CURKEY);
             return CURKEY;
         }
-        return null;
+        return CURKEY;
     }
 
     /**
