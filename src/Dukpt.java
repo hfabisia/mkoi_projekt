@@ -48,22 +48,17 @@ public class Dukpt {
         List<String> IPEKs = ReadFile.readFile("IPEK.txt");
         String IPEK = IPEKs.get(0);
         KSNR = KSN.substring(KSN.length() - 16, KSN.length());
-        System.out.println("KSNR " + KSNR);
         IKEY = IPEK.substring(IPEK.length() - 32, IPEK.length());
-        System.out.println("IKEY " + IKEY);
         //1) Copy IKEY into CURKEY.
         CURKEY = IKEY;
         //2) Copy KSNR into R8. 3) Clear the 21 right-most bits of R8.
         R8 = clearBits(hexToBin(KSNR), 21);
-        System.out.println("R8 " + R8);
         //4) Copy the 21 right-most bits of KSNR into R3.
         R3 = hexToBin(KSNR).substring(hexToBin(KSNR).length() - 21, hexToBin(KSNR).length());
-        System.out.println("R3 " + R3);
         //5) Set the left-most bit of SR, clearing the other 20 bits.
         setSR("100000000000000000000");
         intSR = Integer.parseInt(getSR(), 2);
 
-        System.out.println("SR " + SR);
     }
 
     /**
@@ -84,14 +79,11 @@ public class Dukpt {
      */
     public String TAG1(Dukpt dukpt) {
         //1) Is SR AND'ed with R3 = 0? If yes, go to "TAG2".
-//    System.out.println("intSR "+intSR);
         int intR3 = Integer.parseInt(dukpt.getR3(), 2);
-//    System.out.println(intR3);
 
         if ((intSR & intR3) == 0) {
             TAG2(dukpt);
         } else {
-            System.out.println("else");
             //2) "OR" SR into the 21 right-most bits of R8. (This sets the R8 bit corresponding to the SR bit that is set.)
             String rightMost21bitsR8 = dukpt.getR8().substring(dukpt.getR8().length() - 21, dukpt.getR8().length());
             Integer intRightMost21bitsR8 = Integer.parseInt(rightMost21bitsR8, 2);
@@ -107,13 +99,10 @@ public class Dukpt {
             //3) XOR the right half of CURKEY with R8 and store the result into R8A.
             String R8Av1 = xorLongStrings(CURKEY.substring(CURKEY.length() / 2, CURKEY.length()), binToHex(R8));
             R8A = checkLength(R8Av1, CURKEY.substring(CURKEY.length() / 2, CURKEY.length()));
-            System.out.println("R8A - " + R8A);
 
             //4) DEA-encrypt R8A using the left half of CURKEY as the key and store the result into R8A.
             String desKey = getCURKEY().substring(0, getCURKEY().length() / 2);//"1113456789abcdef";
-            System.out.println("desKey - " + desKey);
             R8A = DES.finalOutput(R8A, desKey);
-            System.out.println("R8A po encrypcie - " + R8A);
 
             //5) XOR R8A with the right half of CURKEY and store the result into R8A.
             String R8Av2 = xorLongStrings(CURKEY.substring(CURKEY.length() / 2, CURKEY.length()), R8A);
@@ -130,17 +119,15 @@ public class Dukpt {
             String R8Bv1 = xorLongStrings(CURKEY.substring(CURKEY.length() / 2, CURKEY.length()), binToHex(R8));
             R8B = checkLength(R8Bv1, CURKEY.substring(CURKEY.length() / 2, CURKEY.length()));
             //8) DEA-encrypt R8B using the left half of CURKEY as the key and store the result into R8B.
-//      System.out.println("desKey - "+desKey);
             String desKey1 = CURKEY.substring(0, CURKEY.length() / 2);
             R8B = DES.finalOutput(R8B, desKey1);
-            System.out.println("R8B po encrypcie - " + R8B);
             //9) XOR R8B with the right half of CURKEY and store the result into R8B.
             String R8Bv2 = xorLongStrings(CURKEY.substring(CURKEY.length() / 2, CURKEY.length()), R8B);
             R8B = checkLength(R8Bv2, CURKEY.substring(CURKEY.length() / 2, CURKEY.length()));
             //10)Store R8A into the right half of CURKEY.
             // 11) Store R8B into the left half of CURKEY.
             CURKEY = R8B + R8A;
-            System.out.println("CURKEY - " + CURKEY);
+            System.out.println("Derived PEK: " + CURKEY);
             return CURKEY;
         }
         return null;
@@ -211,7 +198,6 @@ public class Dukpt {
         x = s1.substring(0, s1.length() - bit);
         y = s1.substring(s1.length() - bit, (s1.length()));
         z = y.replace('1', '0');
-//    System.out.println(z);
         s1 = x + z;
         return s1;
     }
